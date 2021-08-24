@@ -14,7 +14,7 @@ const options = { path: "/chat-app/" };
 Vue.use(
   new VueSocketIO({
     debug: true,
-    connection: SocketIO("http://192.168.0.10:3000", options),
+    connection: SocketIO(process.env.VUE_APP_API_HOST, options),
     vuex: {
       store,
       actionPrefix: "SOCKET_",

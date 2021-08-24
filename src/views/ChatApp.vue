@@ -52,7 +52,7 @@ export default {
     },
 
     async fetchMessages() {
-      const res = await fetch("http://192.168.0.10:3000/messages");
+      const res = await fetch(`${process.env.VUE_APP_API_HOST}/messages`);
       const result = await res.json();
       this.listMessages = result;
     },
