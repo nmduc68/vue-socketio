@@ -13,7 +13,7 @@ const options = { path: "/chat-app/" };
 // Using socket.io-client Instance
 Vue.use(
   new VueSocketIO({
-    debug: true,
+    debug: false,
     connection: SocketIO(process.env.VUE_APP_API_HOST, options),
     vuex: {
       store,

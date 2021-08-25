@@ -56,6 +56,11 @@
       </v-col>
     </v-row>
     <div class="custom-text-input white py-1">
+      <div class="d-block">
+        <span v-if="isUserTyping" class="user-typing blue-grey--text pl-2">{{
+          `${userTyping.name} is typing...`
+        }}</span>
+      </div>
       <div class="d-flex">
         <v-text-field
           label="Message"
@@ -64,6 +69,7 @@
           class="m-0"
           solo
           hide-details="auto"
+          @keyup="typingMessage"
           @keyup.enter="sendMessage"
         ></v-text-field>
         <v-btn
@@ -100,6 +106,9 @@ export default {
     listMessages: [],
     message: "",
     loading: true,
+    timeout: undefined,
+    isUserTyping: false,
+    userTyping: null,
   }),
 
   computed: {
@@ -131,6 +140,16 @@ export default {
     getMessages(data) {
       this.listMessages = [...this.listMessages, data];
     },
+
+    userTyping(data) {
+      if (!data) {
+        this.isUserTyping = false;
+      } else {
+        this.isUserTyping = true;
+      }
+
+      this.userTyping = data;
+    },
   },
 
   methods: {
@@ -150,18 +169,26 @@ export default {
       this.scrollToEnd();
     },
 
+    async fetchMessages() {
+      const res = await APIService.get("/messages");
+      this.listMessages = res.data;
+    },
+
     scrollToEnd() {
-      // const content = this.$refs.messagesContainer;
-      // content.scrollTop = content.scrollHeight;
       window.scrollTo(
         0,
         document.body.scrollHeight || document.documentElement.scrollHeight
       );
     },
 
-    async fetchMessages() {
-      const res = await APIService.get("/messages");
-      this.listMessages = res.data;
+    timeoutFunction() {
+      this.$socket.emit("typingMessage", null);
+    },
+
+    typingMessage() {
+      this.$socket.emit("typingMessage", this.user);
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(this.timeoutFunction, 1500);
     },
   },
 
@@ -194,4 +221,7 @@ export default {
   bottom: 0
   left: 0
   width: 100%
+
+.user-typing
+  font-size: 10px
 </style>
